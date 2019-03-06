@@ -276,7 +276,7 @@ void readfile(const char *filename)
           if (validinput)
           {
 
-            std::cout << "scale" << std::endl;
+            //std::cout << "scale" << std::endl;
             // YOUR CODE FOR HW 2 HERE.
             // Think about how the transformation stack is affected
             // You might want to use helper functions on top of file.
@@ -289,7 +289,7 @@ void readfile(const char *filename)
           validinput = readvals(s, 4, values);
           if (validinput)
           {
-            std::cout << "here" << std::endl;
+            //std::cout << "here" << std::endl;
 
             // YOUR CODE FOR HW 2 HERE.
             // values[0..2] are the axis, values[3] is the angle.
@@ -335,7 +335,7 @@ void readfile(const char *filename)
     // Set up initial position for eye, up and amount
     // As well as booleans
 
-    std::cout << glm::to_string(upinit) << std::endl;
+    //std::cout << glm::to_string(upinit) << std::endl;
     eye = eyeinit;
     up = upinit;
     amount = amountinit;

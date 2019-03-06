@@ -1,5 +1,4 @@
 #define MAINPROGRAM
-#include "Scene.h"
 #include "readfile.h"
 #include <FreeImage.h>
 #include "Raytracer.h"

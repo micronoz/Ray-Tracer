@@ -50,7 +50,7 @@ mat4 Transform::lookAt(const vec3 &eye, const vec3 &center, const vec3 &up)
                     u[2], v[2], w[2], 0.0f,
                     0.0f, 0.0f, 0.0f, 1.0f);
     mat4 tr = mat4(1.0f);
-    std::cout << glm::to_string(eye) << std::endl;
+    //std::cout << glm::to_string(eye) << std::endl;
     tr[3][0] = -eye[0];
     tr[3][1] = -eye[1];
     tr[3][2] = -eye[2];

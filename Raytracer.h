@@ -30,7 +30,7 @@ class Raytracer
                 touches = (*it)->intersect(orig, dir, all);
             else
                 touches = (*it)->intersect(orig, dir, all);
-                
+
             if (touches)
             {
                 if (nearest < 0)
