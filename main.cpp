@@ -25,9 +25,9 @@ int main(int argc, char *argv[])
 
     vec3 *framebuffer;
     Raytracer *tracer = new Raytracer(h, w, fovy, &shapes);
-    vec3 orig(0.0f);
+
     mat4 lookat = Transform::lookAt(eyeinit, center, upinit);
-    vec3 defaultcol(1, 0, 0);
+
     for (vector<Shape *>::iterator u = shapes.begin(); u != shapes.end(); u++)
         (*u)->applyLookAt(lookat);
 
@@ -48,17 +48,17 @@ int main(int argc, char *argv[])
         std::cout << "Done!" << std::endl;
     FreeImage_DeInitialise();
 
-    std::ofstream ofs(argv[2], std::ios::out | std::ios::binary);
-    ofs << "P6\n"
-        << w << " " << h << "\n255\n";
-    for (int i = 0; i < h * w; ++i)
-    {
-        char r = (char)(255 * clamp(0, 1, framebuffer[i].x));
-        char g = (char)(255 * clamp(0, 1, framebuffer[i].y));
-        char b = (char)(255 * clamp(0, 1, framebuffer[i].z));
-        ofs << r << g << b;
-    }
+    // std::ofstream ofs(argv[2], std::ios::out | std::ios::binary);
+    // ofs << "P6\n"
+    //     << w << " " << h << "\n255\n";
+    // for (int i = 0; i < h * w; ++i)
+    // {
+    //     char r = (char)(255 * clamp(0, 1, framebuffer[i].x));
+    //     char g = (char)(255 * clamp(0, 1, framebuffer[i].y));
+    //     char b = (char)(255 * clamp(0, 1, framebuffer[i].z));
+    //     ofs << r << g << b;
+    // }
 
-    ofs.close();
+    // ofs.close();
     return 0;
 }
