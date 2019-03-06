@@ -93,4 +93,4 @@ EXTERN int shininesscol;
 //Define vertices;
 EXTERN int maxverts;
 EXTERN vector<vec3> vertices;
-EXTERN vector<Triangle *> triangles;
+EXTERN vector<Shape *> shapes;

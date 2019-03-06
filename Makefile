@@ -15,9 +15,9 @@ endif
 
 RM = /bin/rm -f 
 all: transforms
-transforms: main.o Transform.o readfile.o Scene.o Triangle.h Sphere.h
+transforms: main.o Transform.o readfile.o Scene.o
 	$(CC) $(CFLAGS) -o raytracer main.o Transform.o readfile.o Scene.o $(INCFLAGS) $(LDFLAGS) 
-main.o: main.cpp Transform.h variables.h Triangle.h Sphere.h
+main.o: main.cpp Transform.h variables.h Shape.h Triangle.h Sphere.h Raytracer.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c main.cpp
 readfile.o: readfile.cpp Triangle.h Sphere.h readfile.h variables.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c readfile.cpp
@@ -25,6 +25,8 @@ Transform.o: Transform.cpp Transform.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c Transform.cpp
 Scene.o: Scene.cpp Scene.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c Scene.cpp
+#Triangle.o: Triangle.cpp Triangle.h Shape.h
+#	$(CC) $(CFLAGS) $(INCFLAGS) -c Triangle.cpp
 clean: 
 	$(RM) *.o transforms *.png
 

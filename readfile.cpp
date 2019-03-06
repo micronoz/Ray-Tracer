@@ -125,19 +125,38 @@ void readfile(const char *filename)
         // Note that no transforms/stacks are applied to the colors.
         else if (cmd == "tri")
         {
-          validinput = readvals(s, 3, values); // colors
+          validinput = readvals(s, 3, values);
           if (validinput)
           {
-            Triangle *tri = new Triangle(vertices[values[0]], vertices[values[1]], vertices[values[2]], transfstack.top());
+            Shape *sh = new Triangle(vertices[values[0]], vertices[values[1]], vertices[values[2]], transfstack.top());
             for (i = 0; i < 4; i++)
             {
-              (tri->ambient)[i] = ambient[i];
-              (tri->diffuse)[i] = diffuse[i];
-              (tri->specular)[i] = specular[i];
-              (tri->emission)[i] = emission[i];
+              (sh->ambient)[i] = ambient[i];
+              (sh->diffuse)[i] = diffuse[i];
+              (sh->specular)[i] = specular[i];
+              (sh->emission)[i] = emission[i];
             }
-            tri->shininess = shininess;
-            triangles.push_back(tri);
+            sh->shininess = shininess;
+            sh->istriangle = true;
+            shapes.push_back(sh);
+          }
+        }
+        else if (cmd == "sphere")
+        {
+          validinput = readvals(s, 4, values);
+          if (validinput)
+          {
+            Shape *sh = new Sphere(values[0], values[1], values[2], values[3], transfstack.top());
+            for (i = 0; i < 4; i++)
+            {
+              (sh->ambient)[i] = ambient[i];
+              (sh->diffuse)[i] = diffuse[i];
+              (sh->specular)[i] = specular[i];
+              (sh->emission)[i] = emission[i];
+            }
+            sh->shininess = shininess;
+            sh->istriangle = true;
+            shapes.push_back(sh);
           }
         }
         else if (cmd == "vertex")

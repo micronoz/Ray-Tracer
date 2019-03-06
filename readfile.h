@@ -8,9 +8,7 @@
 #include <vector>
 
 using namespace std;
-
-constexpr float kEpsilon = 1e-8;
-
+#include "Shape.h"
 #include "Transform.h"
 #include "Sphere.h"
 #include "Triangle.h"
