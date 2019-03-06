@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (FreeImage_Save(FIF_PNG, bitmap, "test.png", 0))
+    if (FreeImage_Save(FIF_PNG, bitmap, argv[2], 0))
         std::cout << "Done!" << std::endl;
     FreeImage_DeInitialise();
 
