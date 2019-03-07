@@ -7,40 +7,34 @@
 #include "Transform.h"
 
 // Helper rotation function.  Please implement this.
-mat3 Transform::rotate(const float degrees, const vec3 &axis)
+mat4 Transform::rotate(const float degrees, const vec3 &axis)
 {
     mat3 I = mat3(1.0f);
     vec3 a = glm::normalize(axis);
     //float rad = glm::radians(degrees); //Degree to radian conversion
 
-    float rad = degrees * pi / 180.0f; //Degree to radian conversion
+    float rad = glm::radians(degrees); //Degree to radian conversion
     float x = a[0];
     float y = a[1];
     float z = a[2];
 
     mat3 aat = mat3(x * x, x * y, x * z, x * y, y * y, y * z, x * z, y * z, z * z);
+    //std::cout << glm::to_string(aat) << std::endl;
+
     mat3 as = mat3(0.0f, z, -y, -z, 0.0f, x, y, -x, 0.0f);
+    //std::cout << glm::to_string(as) << std::endl;
+    //std::cout << as[0][1] << std::endl;
     mat3 rot = (float(cos(rad)) * I) + (float(1.0 - cos(rad)) * aat) + (float(sin(rad)) * as);
 
-    return rot;
-}
+    mat4 ret(rot);
 
-void Transform::left(float degrees, vec3 &eye, vec3 &up)
-{
-    eye = rotate(degrees, glm::normalize(up)) * eye;
-}
+    ret[3][3] = 1.0f;
 
-void Transform::up(float degrees, vec3 &eye, vec3 &up)
-{
-    vec3 cr = glm::cross(eye, up);
-    cr = glm::normalize(cr);
-    up = rotate(degrees, cr) * up;
-    eye = rotate(degrees, cr) * eye;
+    return ret;
 }
 
 mat4 Transform::lookAt(const vec3 &eye, const vec3 &center, const vec3 &up)
 {
-    
     vec3 w = glm::normalize(eye - center);
     vec3 u = glm::cross(up, w);
     u = glm::normalize(u);
@@ -57,20 +51,7 @@ mat4 Transform::lookAt(const vec3 &eye, const vec3 &center, const vec3 &up)
 
     mat4 ret = rot * tr;
 
-    return ret;
-}
-
-mat4 Transform::perspective(float fovy, float aspect, float zNear, float zFar)
-{
-    float d = 1.0f / tan(glm::radians(fovy / 2.0f));
-    float A = -(zNear + zFar) / (zFar - zNear);
-    float B = -2.0f * (zFar * zNear) / (zFar - zNear);
-    mat4 ret = mat4(d / aspect, 0.0f, 0.0f, 0.0f,
-                    0.0f, d, 0.0f, 0.0f,
-                    0.0f, 0.0f, A, -1.0f,
-                    0.0f, 0.0f, B, 0.0f);
-
-    return ret;
+    return rot;
 }
 
 mat4 Transform::scale(const float &sx, const float &sy, const float &sz)
@@ -97,7 +78,7 @@ mat4 Transform::translate(const float &tx, const float &ty, const float &tz)
 // This function is provided as a helper, in case you want to use it.
 // Using this function (in readfile.cpp or display.cpp) is optional.
 
-vec3 Transform::upvector(const vec3 &up, const vec3 &zvec)
+vec3 Transform::upvector(const vec3 up, const vec3 zvec)
 {
     vec3 x = glm::cross(up, zvec);
     vec3 y = glm::cross(zvec, x);

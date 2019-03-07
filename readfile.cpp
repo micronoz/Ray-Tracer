@@ -36,7 +36,7 @@ void matransform(stack<mat4> &transfstack, float *values)
     values[i] = newval[i];
 }
 
-void rightmultiply(const mat4 &M, stack<mat4> &transfstack)
+void rightmultiply(const mat4 M, stack<mat4> &transfstack)
 {
   mat4 &T = transfstack.top();
   T = T * M;
@@ -80,6 +80,7 @@ void readfile(const char *filename)
 
         stringstream s(str);
         s >> cmd;
+        std::cout << cmd << std::endl;
         int i;
         float values[10]; // Position and color for light, colors for others
         // Up to 10 params for cameras.
@@ -128,7 +129,7 @@ void readfile(const char *filename)
           validinput = readvals(s, 3, values);
           if (validinput)
           {
-            Shape *sh = new Triangle(vertices[values[0]], vertices[values[1]], vertices[values[2]], transfstack.top());
+            Shape *sh = new Triangle(vertices[int(values[0])], vertices[int(values[1])], vertices[int(values[2])], transfstack.top());
             for (i = 0; i < 4; i++)
             {
               (sh->ambient)[i] = ambient[i];
@@ -147,6 +148,7 @@ void readfile(const char *filename)
           if (validinput)
           {
             Shape *sh = new Sphere(values[0], values[1], values[2], values[3], transfstack.top());
+            std::cout << values[0] << values[1] << values[2] << values[3] << std::endl;
             for (i = 0; i < 4; i++)
             {
               (sh->ambient)[i] = ambient[i];
@@ -155,7 +157,7 @@ void readfile(const char *filename)
               (sh->emission)[i] = emission[i];
             }
             sh->shininess = shininess;
-            sh->istriangle = true;
+            sh->istriangle = false;
             shapes.push_back(sh);
           }
         }
@@ -164,7 +166,7 @@ void readfile(const char *filename)
           validinput = readvals(s, 3, values); // colors
           if (validinput)
           {
-            vec3 vertex = vec3(values[0], values[1], values[2]);
+            vec4 vertex = vec4(values[0], values[1], values[2], 1.0f);
             vertices.push_back(vertex);
           }
         }
@@ -233,8 +235,8 @@ void readfile(const char *filename)
           validinput = readvals(s, 2, values);
           if (validinput)
           {
-            w = (int)values[0];
-            h = (int)values[1];
+            screenwidth = (int)values[0];
+            screenheight = (int)values[1];
           }
         }
         else if (cmd == "camera")
@@ -250,8 +252,8 @@ void readfile(const char *filename)
             // Set eyeinit upinit center fovy in variables.h
             eyeinit = vec3(values[0], values[1], values[2]);
             center = vec3(values[3], values[4], values[5]);
-            upinit = Transform::upvector(vec3(values[6], values[7], values[8]), eyeinit);
-            //upinit = glm::normalize(vec3(values[6], values[7], values[8]));
+            //upinit = vec3(values[6], values[7], values[8]);
+            upinit = Transform::upvector(vec3(values[6],values[7],values[8]), eyeinit);
             fovy = values[9];
           }
         }
@@ -267,7 +269,7 @@ void readfile(const char *filename)
             // You might want to use helper functions on top of file.
             // Also keep in mind what order your matrix is!
 
-            rightmultiply(Transform::translate(values[0], values[1], values[2]), transfstack);
+            rightmultiply(glm::translate(vec3(values[0], values[1], values[2])), transfstack);
           }
         }
         else if (cmd == "scale")
@@ -276,12 +278,7 @@ void readfile(const char *filename)
           if (validinput)
           {
 
-            //std::cout << "scale" << std::endl;
-            // YOUR CODE FOR HW 2 HERE.
-            // Think about how the transformation stack is affected
-            // You might want to use helper functions on top of file.
-            // Also keep in mind what order your matrix is!
-            rightmultiply(Transform::scale(values[0], values[1], values[2]), transfstack);
+            rightmultiply(glm::scale(vec3(values[0], values[1], values[2])), transfstack);
           }
         }
         else if (cmd == "rotate")
@@ -289,33 +286,24 @@ void readfile(const char *filename)
           validinput = readvals(s, 4, values);
           if (validinput)
           {
-            //std::cout << "here" << std::endl;
-
-            // YOUR CODE FOR HW 2 HERE.
-            // values[0..2] are the axis, values[3] is the angle.
-            // You may want to normalize the axis (or in Transform::rotate)
-            // See how the stack is affected, as above.
-            // Note that rotate returns a mat3.
-            // Also keep in mind what order your matrix is!
-            vec3 input = vec3(values[0], values[1], values[2]);
-            mat3 t = Transform::rotate(values[3], input);
-            mat4 final_rot = mat4(t[0][0], t[0][1], t[0][2], 0.0f,
-                                  t[1][0], t[1][1], t[1][2], 0.0f,
-                                  t[2][0], t[2][1], t[2][2], 0.0f,
-                                  0.0f, 0.0f, 0.0f, 1.0f);
-            rightmultiply(final_rot, transfstack);
+            std::cout << "here" << std::endl;
+            vec3 input(values[0], values[1], values[2]);
+            rightmultiply(Transform::rotate(values[3], input), transfstack);
           }
         }
 
         // I include the basic push/pop code for matrix stacks
         else if (cmd == "pushTransform")
         {
+          std::cout << "push" << std::endl;
           transfstack.push(transfstack.top());
         }
         else if (cmd == "popTransform")
         {
+          std::cout << "pop" << std::endl;
           if (transfstack.size() <= 1)
           {
+            
             cerr << "Stack has no elements.  Cannot Pop\n";
           }
           else
@@ -332,18 +320,6 @@ void readfile(const char *filename)
       getline(in, str);
     }
 
-    // Set up initial position for eye, up and amount
-    // As well as booleans
-
-    //std::cout << glm::to_string(upinit) << std::endl;
-    eye = eyeinit;
-    up = upinit;
-    amount = amountinit;
-    sx = sy = 1.0;  // keyboard controlled scales in x and y
-    tx = ty = 0.0;  // keyboard controllled translation in x and y
-    useGlu = false; // don't use the glu perspective/lookat fns
-
-    //    glEnable(GL_DEPTH_TEST);
   }
   else
   {

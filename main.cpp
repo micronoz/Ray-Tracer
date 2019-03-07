@@ -20,27 +20,30 @@ int main(int argc, char *argv[])
     readfile(argv[1]);
 
     FreeImage_Initialise();
-    FIBITMAP *bitmap = FreeImage_Allocate(w, h, BPP);
+    FIBITMAP *bitmap = FreeImage_Allocate(screenwidth, screenheight, BPP);
     RGBQUAD color;
 
     vec3 *framebuffer;
-    Raytracer *tracer = new Raytracer(h, w, fovy, &shapes);
+    
+    std::cout << glm::to_string(eyeinit) << std::endl;
+    std::cout << glm::to_string(center) << std::endl;
+    std::cout << glm::to_string(upinit) << std::endl;
+    mat4 lookat = glm::lookAt(eyeinit, center, upinit);
+    Raytracer *tracer = new Raytracer(screenheight, screenwidth, fovy, &shapes, lookat);
 
-    mat4 lookat = Transform::lookAt(eyeinit, center, upinit);
-
-    for (vector<Shape *>::iterator u = shapes.begin(); u != shapes.end(); u++)
-        (*u)->applyLookAt(lookat);
+    //for (vector<Shape *>::iterator u = shapes.begin(); u != shapes.end(); u++)
+    //    (*u)->applyLookAt(lookat);
 
     framebuffer = tracer->render();
 
-    for (int i = 0; i < w; i++)
+    for (int j = 0; j < screenheight; j++)
     {
-        for (int j = 0; j < h; j++)
+        for (int i = 0; i < screenwidth; i++)
         {
-            color.rgbRed = (255 * clamp(0, 1, framebuffer[(w * j) + i].x));
-            color.rgbGreen = (255 * clamp(0, 1, framebuffer[(w * j) + i].y));
-            color.rgbBlue = (255 * clamp(0, 1, framebuffer[(w * j) + i].z));
-            FreeImage_SetPixelColor(bitmap, i, h - j, &color);
+            color.rgbRed = (255 * framebuffer[(screenwidth * j) + i].x);
+            color.rgbGreen = (255 * framebuffer[(screenwidth * j) + i].y);
+            color.rgbBlue = (255 * framebuffer[(screenwidth * j) + i].z);
+            FreeImage_SetPixelColor(bitmap, i, screenheight-j, &color);
         }
     }
 
@@ -60,5 +63,6 @@ int main(int argc, char *argv[])
     // }
 
     // ofs.close();
+    delete [] framebuffer;
     return 0;
 }

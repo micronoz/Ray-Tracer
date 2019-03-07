@@ -1,5 +1,6 @@
 CC = g++
-CFLAGS = -Ofast -funroll-loops
+CFLAGS = -O3 -funroll-loops
+#CFLAGS = 
 INCFLAGS = -I./glm-0.9.7.1
 LDFLAGS = -lfreeimage
 
