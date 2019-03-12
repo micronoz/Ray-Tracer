@@ -6,14 +6,14 @@ LDFLAGS = -lfreeimage
 
 RM = /bin/rm -f 
 all: raytracer
-raytracer: main.o Transform.o readfile.o
-	$(CC) $(CFLAGS) -o raytracer main.o Transform.o readfile.o $(INCFLAGS) $(LDFLAGS) 
+raytracer: main.o readfile.o
+	$(CC) $(CFLAGS) -o raytracer main.o readfile.o $(INCFLAGS) $(LDFLAGS) 
 main.o: main.cpp readfile.o Raytracer.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c main.cpp
-readfile.o: readfile.cpp Shape.h Triangle.h Sphere.h Light.h readfile.h variables.h Transform.o
+readfile.o: readfile.cpp Shape.h Triangle.h Sphere.h Light.h readfile.h variables.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c readfile.cpp
-Transform.o: Transform.cpp Transform.h 
-	$(CC) $(CFLAGS) $(INCFLAGS) -c Transform.cpp
+#Transform.o: Transform.cpp Transform.h 
+#	$(CC) $(CFLAGS) $(INCFLAGS) -c Transform.cpp
 clean: 
 	$(RM) *.o *.png raytracer
 

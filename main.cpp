@@ -49,7 +49,6 @@ int main(int argc, char *argv[])
         std::cout << "Error" << std::endl;
     FreeImage_DeInitialise();
 
-    
     // std::ofstream ofs(argv[2], std::ios::out | std::ios::binary);
     // ofs << "P6\n"
     //     << w << " " << h << "\n255\n";
@@ -62,6 +61,12 @@ int main(int argc, char *argv[])
     // }
 
     // ofs.close();
+    for (vector<Shape *>::iterator it = shapes.begin(); it != shapes.end(); it++)
+        delete *it;
+    for (vector<Light *>::iterator it = lights.begin(); it != lights.end(); it++)
+        delete *it;
+    delete tracer;
+    FreeImage_Unload(bitmap);
     delete[] framebuffer;
     return 0;
 }

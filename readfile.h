@@ -21,7 +21,7 @@ using namespace std;
 constexpr float kEpsilon = 1e-3;
 
 #include "Shape.h"
-#include "Transform.h"
+//#include "Transform.h"
 #include "Light.h"
 #include "Sphere.h"
 #include "Triangle.h"
