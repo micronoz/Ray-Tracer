@@ -1,11 +1,14 @@
+#include <cstdlib>
+
 class Raytracer
 {
   public:
     float aspect, invheight, invwidth, angle;
     float height, width;
     vector<Shape *> *sh;
+    vector<Light *> *lt;
     mat4 lookatmat, invlookat;
-    Raytracer(int height, int width, float angle, vector<Shape *> *sh, mat4 &lookat)
+    Raytracer(int height, int width, float angle, vector<Shape *> *sh, vector<Light *> *lt, mat4 &lookat)
     {
         this->width = float(width);
         this->height = float(height);
@@ -15,82 +18,82 @@ class Raytracer
         this->aspect = width / float(height);
         //std::cout << this->aspect << "sssssssssssss"<<std::endl;
         this->sh = sh;
+        this->lt = lt;
         this->lookatmat = lookat;
         this->invlookat = glm::inverse(lookat);
     };
     ~Raytracer(){};
 
-    Shape *trace(vec4 orig, vec4 direction)
+    vec3 trace(vec4 orig, vec4 direction, int depth)
     {
+        vec3 color(0.0f, 0.0f, 0.0f);
+        //std::cout << maxdepth << std::endl;
+        if (depth > maxdepth)
+            return color;
         Shape *choice = NULL;
         float allval[3];
-        float nearest = -1;
+        float nearest = INFINITY;
         bool touches = false;
-        //std::cout << "STARTING OBJECT CHECK---------------------------------" << std::endl;
         direction = glm::normalize(direction);
+        //cout << glm::to_string(direction) << endl;
         float t;
+        vec4 normal, finaldir, point, finalpoint;
         for (vector<Shape *>::iterator it = this->sh->begin(); it != this->sh->end(); it++)
         {
-            vec4 finaldir;
-            touches = (*it)->intersect(orig, direction, allval, finaldir);
+            touches = (*it)->intersect(orig, direction, allval, normal, point);
             t = allval[0];
-            if (touches)
+
+            if (touches && t <= nearest && t > 0)
             {
-                //if ((*it)->istriangle) std::cout << "Triangle touched" << std::endl;
-                //else std::cout << "Sphere touched" << std::endl;
-                if (nearest == -1 && t > 0)
-                {
-                    nearest = t;
-                    choice = *it;
-                }
-                else if (t <= nearest && t > 0)
-                {
-                    nearest = t;
-                    choice = *it;
-                }
-                //std::cout << "value : "<< t << std::endl;
+                nearest = t;
+                choice = *it;
+                finaldir = normal;
+                finalpoint = point;
             }
-                
-            
         }
-        //if (choice == NULL) std::cout << "NOTHING TOUCHED" << std::endl;
-        return choice;
+        if (choice != NULL)
+        {
+            
+            color = choice->ambient + choice->emission;
+            //cout << glm::to_string(direction) << endl;
+            for (vector<Light *>::iterator it = this->lt->begin(); it != this->lt->end(); it++)
+                color += (*it)->trace(finalpoint, choice->diffuse, choice->specular, finaldir, choice->shininess, direction);
+            //std::cout << glm::to_string(choice->diffuse) << std::endl;
+            
+            return color + choice->specular * this->trace(finalpoint, direction - 2.0f*(glm::dot(direction, finaldir) * finaldir), depth + 1);
+        }
+        else
+        {
+            return color;
+        }
     };
 
     vec3 *render()
     {
         vec3 *buffer = new vec3[int(this->width) * int(this->height)];
         vec3 *results = buffer;
-        Shape *choice = NULL;
+
         //vec4 orig = invlookat * vec4(0., 0., 0., 1.);
         vec4 orig = vec4(eyeinit, 1.0f);
-        std::cout << glm::to_string(eyeinit) << std::endl;
+        //std::cout << glm::to_string(eyeinit) << std::endl;
         vec3 uvec(lookatmat[0][0], lookatmat[1][0], lookatmat[2][0]);
         vec3 vvec(lookatmat[0][1], lookatmat[1][1], lookatmat[2][1]);
         vec3 wvec(lookatmat[0][2], lookatmat[1][2], lookatmat[2][2]);
-
-        
+        float LO = -0.000001;
+        float HI = 0.000001;
+        float xdir, ydir;
+        float r3;
         for (int j = 0; j < int(this->height); j++)
         {
             for (int i = 0; i < int(this->width); i++)
             {
-                float xdir, ydir;
-                choice = NULL;
-                xdir = this->angle * this->aspect * (float(i) - (this->width / 2.0f)) / (this->width/2.0f);
-                ydir = this->angle * ((this->height / 2.0f) - float(j)) / (this->height / 2.0f);
-                //vec4 direction(xx, yy, -1.0f, 0.0f);
-                vec4 direction;
-                direction = vec4(glm::normalize(xdir * uvec + ydir * vvec - wvec), 0.0f);
-                //std::cout << glm::to_string(orig) << std::endl;
-                choice = this->trace(orig, direction);
-                if (choice != NULL)
-                {
-                    *results = vec3(choice->ambient[0], choice->ambient[1], choice->ambient[2]);
-                }
-                else
-                {
-                    *results = vec3(0., 0., 0.);
-                }
+                r3 = LO + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (HI - LO)));
+                xdir = this->angle * this->aspect * (float(i + r3) - (this->width / 2.0f)) / (this->width / 2.0f);
+                r3 = LO + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (HI - LO)));
+                ydir = this->angle * ((this->height / 2.0f) - float(j + r3)) / (this->height / 2.0f);
+                vec4 direction = vec4(glm::normalize(xdir * uvec + ydir * vvec - wvec), 0.0f);
+
+                *results = this->trace(orig, direction, 0);
 
                 results++;
             }

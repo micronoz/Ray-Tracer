@@ -63,6 +63,13 @@ void readfile(const char *filename)
   string str, cmd;
   ifstream in;
   in.open(filename);
+
+  //Initial values
+  maxdepth = 5;
+  ambient[0], ambient[1], ambient[2] = 0.2f;
+  attenuation[0] = 1.0f;
+  attenuation[1], attenuation[2] = 0.0f;
+
   if (in.is_open())
   {
 
@@ -80,7 +87,6 @@ void readfile(const char *filename)
 
         stringstream s(str);
         s >> cmd;
-        std::cout << cmd << std::endl;
         int i;
         float values[10]; // Position and color for light, colors for others
         // Up to 10 params for cameras.
@@ -88,34 +94,29 @@ void readfile(const char *filename)
 
         // Process the light, add it to database.
         // Lighting Command
-        if (cmd == "light")
+        if (cmd == "directional")
         {
-          if (numused == numLights)
-          { // No more Lights
-            cerr << "Reached Maximum Number of Lights " << numused << " Will ignore further lights\n";
-          }
-          else
+          validinput = readvals(s, 6, values);
+          if (validinput)
           {
-            validinput = readvals(s, 8, values); // Position/color for lts.
-            if (validinput)
-            {
+            Light *obj = new Light(vec4(values[0], values[1], values[2], 0.0f),
+                                   vec3(values[3], values[4], values[5]),
+                                   attenuation, &shapes);
+            obj->isDirectional = true;
+            lights.push_back(obj);
+          }
+        }
 
-              // YOUR CODE FOR HW 2 HERE.
-              // Note that values[0...7] shows the read in values
-              // Make use of lightposn[] and lightcolor[] arrays in variables.h
-              // Those arrays can then be used in display too.
-              lightposn[(numused * 4) + 0] = values[0];
-              lightposn[(numused * 4) + 1] = values[1];
-              lightposn[(numused * 4) + 2] = values[2];
-              lightposn[(numused * 4) + 3] = values[3];
-
-              lightcolor[(numused * 4) + 0] = values[4];
-              lightcolor[(numused * 4) + 1] = values[5];
-              lightcolor[(numused * 4) + 2] = values[6];
-              lightcolor[(numused * 4) + 3] = values[7];
-
-              ++numused;
-            }
+        else if (cmd == "point")
+        {
+          validinput = readvals(s, 6, values);
+          if (validinput)
+          {
+            Light *obj = new Light(vec4(values[0], values[1], values[2], 1.0f),
+                                   vec3(values[3], values[4], values[5]),
+                                   attenuation, &shapes);
+            obj->isDirectional = false;
+            lights.push_back(obj);
           }
         }
 
@@ -124,13 +125,43 @@ void readfile(const char *filename)
         // Filling this in is pretty straightforward, so I've left it in
         // the skeleton, also as a hint of how to do the more complex ones.
         // Note that no transforms/stacks are applied to the colors.
+        else if (cmd == "maxdepth")
+        {
+          validinput = readvals(s, 1, values);
+          if (validinput)
+          {
+            maxdepth = int(values[0]);
+          }
+        }
+
+        else if (cmd == "attenuation")
+        {
+          validinput = readvals(s, 3, values);
+          if (validinput)
+          {
+            for (int i = 0; i < 3; i++)
+              attenuation[i] = values[i];
+          }
+        }
+
+        else if (cmd == "output")
+        {
+          string strvals;
+          s >> strvals;
+          char *arr = new char[strvals.length() + 1]();
+
+          strcpy(arr, strvals.c_str());
+
+          filen = arr;
+        }
+
         else if (cmd == "tri")
         {
           validinput = readvals(s, 3, values);
           if (validinput)
           {
             Shape *sh = new Triangle(vertices[int(values[0])], vertices[int(values[1])], vertices[int(values[2])], transfstack.top());
-            for (i = 0; i < 4; i++)
+            for (i = 0; i < 3; i++)
             {
               (sh->ambient)[i] = ambient[i];
               (sh->diffuse)[i] = diffuse[i];
@@ -148,8 +179,8 @@ void readfile(const char *filename)
           if (validinput)
           {
             Shape *sh = new Sphere(values[0], values[1], values[2], values[3], transfstack.top());
-            std::cout << values[0] << values[1] << values[2] << values[3] << std::endl;
-            for (i = 0; i < 4; i++)
+            //std::cout << values[0] << values[1] << values[2] << values[3] << std::endl;
+            for (i = 0; i < 3; i++)
             {
               (sh->ambient)[i] = ambient[i];
               (sh->diffuse)[i] = diffuse[i];
@@ -183,7 +214,7 @@ void readfile(const char *filename)
           validinput = readvals(s, 3, values); // colors
           if (validinput)
           {
-            for (i = 0; i < 4; i++)
+            for (i = 0; i < 3; i++)
             {
               ambient[i] = values[i];
             }
@@ -194,7 +225,7 @@ void readfile(const char *filename)
           validinput = readvals(s, 3, values);
           if (validinput)
           {
-            for (i = 0; i < 4; i++)
+            for (i = 0; i < 3; i++)
             {
               diffuse[i] = values[i];
             }
@@ -205,7 +236,7 @@ void readfile(const char *filename)
           validinput = readvals(s, 3, values);
           if (validinput)
           {
-            for (i = 0; i < 4; i++)
+            for (i = 0; i < 3; i++)
             {
               specular[i] = values[i];
             }
@@ -216,7 +247,7 @@ void readfile(const char *filename)
           validinput = readvals(s, 3, values);
           if (validinput)
           {
-            for (i = 0; i < 4; i++)
+            for (i = 0; i < 3; i++)
             {
               emission[i] = values[i];
             }
@@ -252,8 +283,8 @@ void readfile(const char *filename)
             // Set eyeinit upinit center fovy in variables.h
             eyeinit = vec3(values[0], values[1], values[2]);
             center = vec3(values[3], values[4], values[5]);
-            //upinit = vec3(values[6], values[7], values[8]);
-            upinit = Transform::upvector(vec3(values[6],values[7],values[8]), eyeinit);
+            upinit = glm::normalize(vec3(values[6], values[7], values[8]));
+            //upinit = Transform::upvector(vec3(values[6],values[7],values[8]), eyeinit);
             fovy = values[9];
           }
         }
@@ -278,7 +309,7 @@ void readfile(const char *filename)
           if (validinput)
           {
 
-            rightmultiply(glm::scale(vec3(values[0], values[1], values[2])), transfstack);
+            rightmultiply(Transform::scale(values[0], values[1], values[2]), transfstack);
           }
         }
         else if (cmd == "rotate")
@@ -286,7 +317,6 @@ void readfile(const char *filename)
           validinput = readvals(s, 4, values);
           if (validinput)
           {
-            std::cout << "here" << std::endl;
             vec3 input(values[0], values[1], values[2]);
             rightmultiply(Transform::rotate(values[3], input), transfstack);
           }
@@ -295,15 +325,13 @@ void readfile(const char *filename)
         // I include the basic push/pop code for matrix stacks
         else if (cmd == "pushTransform")
         {
-          std::cout << "push" << std::endl;
           transfstack.push(transfstack.top());
         }
         else if (cmd == "popTransform")
         {
-          std::cout << "pop" << std::endl;
           if (transfstack.size() <= 1)
           {
-            
+
             cerr << "Stack has no elements.  Cannot Pop\n";
           }
           else
@@ -319,7 +347,6 @@ void readfile(const char *filename)
       }
       getline(in, str);
     }
-
   }
   else
   {

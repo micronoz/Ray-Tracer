@@ -13,6 +13,7 @@
 #define EXTERN extern
 #endif
 
+
 EXTERN vec3 eyeinit;
 EXTERN vec3 upinit;
 EXTERN vec3 center;
@@ -20,22 +21,24 @@ EXTERN vec3 center;
 EXTERN int screenwidth, screenheight;
 EXTERN float fovy;
 
-// Lighting parameter array, similar to that in the fragment shader
-const int numLights = 10;
-EXTERN float lightposn[4 * numLights];  // Light Positions
-EXTERN float lightcolor[4 * numLights]; // Light Colors
-EXTERN float lightransf[4 * numLights]; // Lights transformed by modelview
-EXTERN int numused;                     // How many lights are used
 
 // Materials (read from file)
 // With multiple objects, these are colors for each.
-EXTERN float ambient[4];
-EXTERN float diffuse[4];
-EXTERN float specular[4];
-EXTERN float emission[4];
+EXTERN float ambient[3];
+EXTERN float diffuse[3];
+EXTERN float specular[3];
+EXTERN float emission[3];
 EXTERN float shininess;
 
 //Define vertices
 EXTERN int maxverts;
 EXTERN vector<vec4> vertices;
 EXTERN vector<Shape *> shapes;
+
+EXTERN char * filen;
+
+EXTERN int maxdepth;
+
+EXTERN float attenuation[3]; //const, linear, quad
+
+EXTERN vector<Light *> lights;

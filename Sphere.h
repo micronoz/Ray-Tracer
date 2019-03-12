@@ -2,13 +2,13 @@
 class Sphere : public Shape
 {
   public:
-    Sphere(float x, float y, float z, float radius, mat4 transformat)
+    Sphere(float &x, float &y, float &z, float &radius, mat4 &transformat)
     {
         this->inversetrans = glm::inverse(transformat);
         this->transformat = transformat;
         this->centerp = vec4(x, y, z, 1.0f);
         this->rad = radius;
-    }
+    };
 
     bool solveQuadratic(const float &acc, const float &bcc, const float &ccc, float &x0, float &x1)
     {
@@ -26,19 +26,14 @@ class Sphere : public Shape
         }
 
         return true;
-    }
+    };
 
-    bool intersect(const vec4 orig, const vec4 dir, float *allval, vec4 direction)
+    bool intersect(const vec4 &orig, const vec4 &dir, float *allval, vec4 &normal, vec4 &point)
     {
-        /*std::cout << "Origin: " <<glm::to_string(vec4(orig, 1.0f)) << std::endl;
-        std::cout << "Inverse origin: " << glm::to_string(inverse * vec4(orig, 1.0f)) << std::endl;
-        std::cout << "Dir: " <<glm::to_string(vec4(dir, 0.0f)) << std::endl;
-        std::cout << "Inverse dir: " << glm::to_string(inverse * vec4(dir, 0.0f)) << std::endl;*/
         vec3 rayorig = vec3(inversetrans * orig);
         vec3 raydir = vec3(glm::normalize(inversetrans * dir));
-        
         float radius2 = this->rad * this->rad;
-        float t0, t1;
+        float t0, t1 = -1;
 
         vec3 L = rayorig - vec3(this->centerp);
         float acc = glm::dot(raydir, raydir);
@@ -49,22 +44,26 @@ class Sphere : public Shape
             return false;
 
         float minum = min(t0, t1);
-        if (minum <= 0) {
+        if (minum <= 0)
+        {
             minum = max(t0, t1);
         }
-        if (minum <= 0) return false;
+        if (minum <= 0)
+            return false;
         t0 = minum;
-        vec4 point = transformat * (vec4(rayorig, 1.0) + t0 * vec4(raydir, 0.0));
-        //std::cout << glm::to_string(point) << std::endl;
+
+        mat3 t = glm::transpose(mat3(inversetrans));
+
+        point = (vec4(rayorig, 1.0) + t0 * vec4(raydir, 0.0));
+        normal = vec4(glm::normalize(t * vec3(point - centerp)), 0.0f);
+        point = transformat * point;
+
         allval[0] = glm::length(point - orig);
 
         return true;
-    }
-
-    void applyLookAt(mat4 &lookat)
-    {
-        //this->center = lookat * this->center;
     };
+
+    void applyLookAt(mat4 &lookat){};
 
     vec4 centerp;
     mat4 inversetrans, transformat;
