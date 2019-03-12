@@ -9,7 +9,6 @@ class Triangle : public Shape
         this->inverse = glm::inverse(transform);
     };
     ~Triangle(){};
-    void applyLookAt(mat4 &lookat){};
     bool intersect(const vec4 &origin, const vec4 &direction, float *all, vec4 &normal, vec4 &point)
     {
         vec3 v0v1 = v1 - v0;
@@ -18,9 +17,9 @@ class Triangle : public Shape
         vec3 dir = vec3(direction);
         vec3 pvec = glm::cross(dir, v0v2);
         float det = glm::dot(v0v1, pvec);
-        /*if (fabs(det) < kEpsilon)
+        if (fabs(det) < kEpsilon)
             return false;
-        */
+        
         float invDet = 1 / det;
 
         vec3 tvec = orig - v0;

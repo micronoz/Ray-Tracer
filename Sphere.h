@@ -10,10 +10,10 @@ class Sphere : public Shape
         this->rad = radius;
     };
 
-    bool solveQuadratic(const float &acc, const float &bcc, const float &ccc, float &x0, float &x1)
+    bool solve(const float &acc, const float &bcc, const float &ccc, float &x0, float &x1)
     {
         float discr = bcc * bcc - 4.0 * acc * ccc;
-        if (discr < 0)
+        if (discr < kEpsilon)
             return false;
         else if (discr == 0)
         {
@@ -24,7 +24,7 @@ class Sphere : public Shape
             x0 = (-bcc + sqrt(discr)) / (2.0 * acc);
             x1 = (-bcc - sqrt(discr)) / (2.0 * acc);
         }
-
+        if (x0 > x1) std::swap(x0, x1); 
         return true;
     };
 
@@ -40,17 +40,14 @@ class Sphere : public Shape
         float bcc = 2 * glm::dot(raydir, L);
         float ccc = glm::dot(L, L) - radius2;
 
-        if (!solveQuadratic(acc, bcc, ccc, t0, t1))
+        if (!solve(acc, bcc, ccc, t0, t1))
             return false;
 
-        float minum = min(t0, t1);
-        if (minum <= 0)
-        {
-            minum = max(t0, t1);
-        }
-        if (minum <= 0)
-            return false;
-        t0 = minum;
+ 
+        if (t0 < kEpsilon) { 
+            t0 = t1; 
+            if (t0 < kEpsilon) return false;
+        } 
 
         mat3 t = glm::transpose(mat3(inversetrans));
 
@@ -63,7 +60,6 @@ class Sphere : public Shape
         return true;
     };
 
-    void applyLookAt(mat4 &lookat){};
 
     vec4 centerp;
     mat4 inversetrans, transformat;

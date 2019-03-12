@@ -18,5 +18,4 @@ public:
   float shininess;
   bool istriangle;
   virtual bool intersect(const vec4 &orig, const vec4 &dir, float *all, vec4 &normal, vec4 &point) = 0;
-  virtual void applyLookAt(mat4 &lookat) = 0;
 };

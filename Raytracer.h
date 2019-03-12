@@ -35,10 +35,9 @@ class Raytracer
         float nearest = INFINITY;
         bool touches = false;
         direction = glm::normalize(direction);
-        //cout << glm::to_string(direction) << endl;
         float t;
         vec4 normal, finaldir, point, finalpoint;
-        orig += kEpsilon * direction;
+        orig += (kEpsilon / 1.0f) * direction;
         for (vector<Shape *>::iterator it = this->sh->begin(); it != this->sh->end(); it++)
         {
             touches = (*it)->intersect(orig, direction, allval, normal, point);
@@ -58,8 +57,8 @@ class Raytracer
             color = choice->ambient + choice->emission;
             for (vector<Light *>::iterator it = this->lt->begin(); it != this->lt->end(); it++)
                 color += (*it)->trace(finalpoint, choice->diffuse, choice->specular, finaldir, choice->shininess, direction);
-            
-            return color + choice->specular * this->trace(finalpoint, direction + 2.0f*(glm::dot(-direction, finaldir) * finaldir), depth + 1);
+
+            return color + choice->specular * this->trace(finalpoint, direction + 2.0f * (glm::dot(-direction, finaldir) * finaldir), depth + 1);
         }
         else
         {
@@ -81,16 +80,20 @@ class Raytracer
         float LO = -0.000001;
         float HI = 0.000001;
         float xdir, ydir;
+        float xx, yy;
         float r3;
         for (int j = 0; j < int(this->height); j++)
         {
             for (int i = 0; i < int(this->width); i++)
             {
                 r3 = LO + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (HI - LO)));
-                xdir = this->angle * this->aspect * (float(i + r3) - (this->width / 2.0f)) / (this->width / 2.0f);
+                xx = (2 * (i + 0.5) / (float)(this->width) - 1) * this->aspect * this->angle;
+                
+                //xdir = this->angle * this->aspect * (float(i + r3) - (this->width / 2.0f)) / (this->width / 2.0f);
                 r3 = LO + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (HI - LO)));
-                ydir = this->angle * ((this->height / 2.0f) - float(j + r3)) / (this->height / 2.0f);
-                vec4 direction = vec4(glm::normalize(xdir * uvec + ydir * vvec - wvec), 0.0f);
+                yy = (1 - 2 * (j - 0.5) / (float)(this->height)) * this->angle;
+                //ydir = this->angle * ((this->height / 2.0f) - float(j + r3)) / (this->height / 2.0f);
+                vec4 direction = vec4(glm::normalize(xx * uvec + yy * vvec - wvec), 0.0f);
 
                 *results = this->trace(orig, direction, 0);
 
