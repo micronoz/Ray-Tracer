@@ -38,6 +38,7 @@ class Raytracer
         //cout << glm::to_string(direction) << endl;
         float t;
         vec4 normal, finaldir, point, finalpoint;
+        orig += kEpsilon * direction;
         for (vector<Shape *>::iterator it = this->sh->begin(); it != this->sh->end(); it++)
         {
             touches = (*it)->intersect(orig, direction, allval, normal, point);
@@ -53,14 +54,12 @@ class Raytracer
         }
         if (choice != NULL)
         {
-            
+            finaldir = glm::normalize(finaldir);
             color = choice->ambient + choice->emission;
-            //cout << glm::to_string(direction) << endl;
             for (vector<Light *>::iterator it = this->lt->begin(); it != this->lt->end(); it++)
                 color += (*it)->trace(finalpoint, choice->diffuse, choice->specular, finaldir, choice->shininess, direction);
-            //std::cout << glm::to_string(choice->diffuse) << std::endl;
             
-            return color + choice->specular * this->trace(finalpoint, direction - 2.0f*(glm::dot(direction, finaldir) * finaldir), depth + 1);
+            return color + choice->specular * this->trace(finalpoint, direction + 2.0f*(glm::dot(-direction, finaldir) * finaldir), depth + 1);
         }
         else
         {

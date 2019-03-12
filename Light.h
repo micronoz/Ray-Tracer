@@ -14,7 +14,7 @@ class Light
             attenuation[i] = att[i];
     }
 
-    vec3 trace(vec4 origin, vec3 diff, vec3 spec, vec4 originorm, float shine, vec4 &direction)
+    vec3 trace(vec4 origin, vec3 &diff, vec3 &spec, vec4 &originorm, float &shine, vec4 &direction)
     {
         float allval[3];
         vec4 normal, finalp, dir;
@@ -35,8 +35,6 @@ class Light
         {
 
             dir = vec4(glm::normalize(vec3(pos_or_dir - origin)), 0.0f);
-            //cout << glm::to_string(dir) << endl;
-            //cout << glm::to_string(originorm) << endl;
             origin += kEpsilon * dir;
             float smallest;
             if (dir[0] != 0)
@@ -63,10 +61,6 @@ class Light
                     (diff * max(glm::dot(dir, originorm), 0.0f) +
                      spec * pow(max(glm::dot(glm::normalize(dir - direction), originorm), 0.0f), shine));
 
-        /*if (originorm[2] == 1)
-            std::cout << glm::to_string(intensity) << std::endl;*/
-
-        //std::cout << glm::to_string(intensity) << std::endl;
         return intensity;
     };
 };

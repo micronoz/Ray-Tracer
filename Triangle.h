@@ -18,9 +18,9 @@ class Triangle : public Shape
         vec3 dir = vec3(direction);
         vec3 pvec = glm::cross(dir, v0v2);
         float det = glm::dot(v0v1, pvec);
-        if (fabs(det) < kEpsilon)
+        /*if (fabs(det) < kEpsilon)
             return false;
-
+        */
         float invDet = 1 / det;
 
         vec3 tvec = orig - v0;
@@ -34,7 +34,7 @@ class Triangle : public Shape
             return false;
 
         all[0] = glm::dot(v0v2, qvec) * invDet;
-
+        //mat3 t = mat3(glm::transpose(this->inverse));
         normal = vec4(glm::normalize(glm::cross(v0v1, v0v2)), 0.0f);
         point = origin + all[0] * direction;
 

@@ -309,7 +309,7 @@ void readfile(const char *filename)
           if (validinput)
           {
 
-            rightmultiply(Transform::scale(values[0], values[1], values[2]), transfstack);
+            rightmultiply(glm::scale(vec3(values[0], values[1], values[2])), transfstack);
           }
         }
         else if (cmd == "rotate")
@@ -318,7 +318,7 @@ void readfile(const char *filename)
           if (validinput)
           {
             vec3 input(values[0], values[1], values[2]);
-            rightmultiply(Transform::rotate(values[3], input), transfstack);
+            rightmultiply(glm::rotate(glm::radians(values[3]), input), transfstack);
           }
         }
 
