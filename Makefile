@@ -1,7 +1,7 @@
 CC = g++
 CFLAGS = -O3 -funroll-loops -g
 #CFLAGS = 
-INCFLAGS = -I./glm-0.9.7.1
+INCFLAGS = -I./glm-0.9.7.1 -fopenmp
 LDFLAGS = -lfreeimage
 
 RM = /bin/rm -f 

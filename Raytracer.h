@@ -37,7 +37,7 @@ class Raytracer
         direction = glm::normalize(direction);
         float t;
         vec4 normal, finaldir, point, finalpoint;
-        orig += (kEpsilon / 1.0f) * direction;
+        orig += (kEpsilon / 0.1f) * direction;
         for (vector<Shape *>::iterator it = this->sh->begin(); it != this->sh->end(); it++)
         {
             touches = (*it)->intersect(orig, direction, allval, normal, point);
@@ -77,27 +77,29 @@ class Raytracer
         vec3 uvec(lookatmat[0][0], lookatmat[1][0], lookatmat[2][0]);
         vec3 vvec(lookatmat[0][1], lookatmat[1][1], lookatmat[2][1]);
         vec3 wvec(lookatmat[0][2], lookatmat[1][2], lookatmat[2][2]);
-        float LO = -0.000001;
-        float HI = 0.000001;
+        //float LO = -0.000001;
+        //float HI = 0.000001;
         float xdir, ydir;
         float xx, yy;
-        float r3;
+        //float r3;
+        #pragma omp parallel for
         for (int j = 0; j < int(this->height); j++)
         {
+            #pragma omp parallel for
             for (int i = 0; i < int(this->width); i++)
             {
-                r3 = LO + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (HI - LO)));
+          //      r3 = LO + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (HI - LO)));
                 xx = (2 * (i + 0.5) / (float)(this->width) - 1) * this->aspect * this->angle;
                 
                 //xdir = this->angle * this->aspect * (float(i + r3) - (this->width / 2.0f)) / (this->width / 2.0f);
-                r3 = LO + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (HI - LO)));
+            //    r3 = LO + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (HI - LO)));
                 yy = (1 - 2 * (j - 0.5) / (float)(this->height)) * this->angle;
                 //ydir = this->angle * ((this->height / 2.0f) - float(j + r3)) / (this->height / 2.0f);
                 vec4 direction = vec4(glm::normalize(xx * uvec + yy * vvec - wvec), 0.0f);
 
-                *results = this->trace(orig, direction, 0);
+                *(results + (j * int(this->width)) + i) = this->trace(orig, direction, 0);
 
-                results++;
+                //results++;
             }
         }
         return buffer;
