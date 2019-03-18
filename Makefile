@@ -27,6 +27,8 @@ test: clean all
 	./raytracer hw3-submissionscenes/scene6.test
 	./raytracer hw3-submissionscenes/scene7.test
 sub: test zip
+final: sub
+	zip Ozberkman_Nabi_HW4_Full.zip *
 
 
 

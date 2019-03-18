@@ -1,1 +1,2 @@
 # Ray-Tracer
+The 'make sub' command will compile and execute the raytracer on the test scenes provided in the hw3-submissionscenes folder. FreeImage C++ packages should be installed. The loops will execute in parallel meaning the CPU will be fully utilized during execution.
