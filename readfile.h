@@ -18,7 +18,7 @@ typedef glm::vec3 vec3;
 typedef glm::vec4 vec4;
 
 using namespace std;
-constexpr float kEpsilon = 1e-3;
+constexpr float kEpsilon = 7e-4;
 
 #include "Shape.h"
 //#include "Transform.h"

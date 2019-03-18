@@ -15,7 +15,19 @@ readfile.o: readfile.cpp Shape.h Triangle.h Sphere.h Light.h readfile.h variable
 #Transform.o: Transform.cpp Transform.h 
 #	$(CC) $(CFLAGS) $(INCFLAGS) -c Transform.cpp
 clean: 
-	$(RM) *.o *.png raytracer
+	$(RM) *.o *.png raytracer hw3.zip
+zip:
+	zip hw3.zip *.png
+test: clean all
+	./raytracer hw3-submissionscenes/scene4-emission.test
+	./raytracer hw3-submissionscenes/scene4-specular.test
+	./raytracer hw3-submissionscenes/scene4-diffuse.test
+	./raytracer hw3-submissionscenes/scene4-ambient.test
+	./raytracer hw3-submissionscenes/scene5.test
+	./raytracer hw3-submissionscenes/scene6.test
+	./raytracer hw3-submissionscenes/scene7.test
+sub: test zip
+
 
 
  

@@ -37,7 +37,7 @@ class Raytracer
         direction = glm::normalize(direction);
         float t;
         vec4 normal, finaldir, point, finalpoint;
-        orig += (kEpsilon / 0.1f) * direction;
+        orig += (kEpsilon / 10.0f) * direction;
         for (vector<Shape *>::iterator it = this->sh->begin(); it != this->sh->end(); it++)
         {
             touches = (*it)->intersect(orig, direction, allval, normal, point);
