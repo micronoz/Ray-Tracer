@@ -5,3 +5,8 @@ The 'make sub' command will compile and execute the raytracer on the test scenes
 
 Requirements:
 Run command 'sudo apt-get install libfreeimage3 libfreeimage-dev' to install the free image library.
+
+## Samples
+![scene7](https://user-images.githubusercontent.com/32474554/56634320-6cab7380-6616-11e9-8f17-27eaff8a9fba.png)
+![scene6](https://user-images.githubusercontent.com/32474554/56634325-72a15480-6616-11e9-93d1-914d190d836b.png)
+![scene4-specular](https://user-images.githubusercontent.com/32474554/56634329-746b1800-6616-11e9-8864-5b058453fa1b.png)
