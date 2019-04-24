@@ -19,13 +19,13 @@ clean:
 zip:
 	zip hw3.zip *.png
 test: clean all
-	./raytracer hw3-submissionscenes/scene4-emission.test
-	./raytracer hw3-submissionscenes/scene4-specular.test
-	./raytracer hw3-submissionscenes/scene4-diffuse.test
-	./raytracer hw3-submissionscenes/scene4-ambient.test
-	./raytracer hw3-submissionscenes/scene5.test
-	./raytracer hw3-submissionscenes/scene6.test
-	./raytracer hw3-submissionscenes/scene7.test
+	./raytracer sample-scenes/scene4-emission.test
+	./raytracer sample-scenes/scene4-specular.test
+	./raytracer sample-scenes/scene4-diffuse.test
+	./raytracer sample-scenes/scene4-ambient.test
+	./raytracer sample-scenes/scene5.test
+	./raytracer sample-scenes/scene6.test
+	./raytracer sample-scenes/scene7.test
 sub: test zip
 final: sub
 	zip Ozberkman_Nabi_HW4_Full.zip *
